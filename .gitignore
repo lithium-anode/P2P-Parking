@@ -1,0 +1,35 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### Database files ###
+*.db
+*.sqlite
+*.mv.db
+*.trace.db
+
+### OS-specific files ###
+.DS_Store
+Thumbs.db
+
+### Log files ###
+*.log
+
+# Package management
+.mvn/
+mvnw
+mvnw.cmd
+
+### VS Code ###
+.vscode/
