@@ -1,6 +1,8 @@
 package parking.project.model;
+
 import jakarta.persistence.*;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -13,11 +15,12 @@ public abstract class User {
 
     @Column(unique = true, nullable = false)
     private String username;
-
-    @Column(nullable = false)
     private String password;
-
     private String email;
-    private String fullName;
-    private String role; // DRIVER, OWNER, or ADMIN
+    private String role; // DRIVER, OWNER, ADMIN
+
+    @Enumerated(EnumType.STRING)
+    private UserStatus status = UserStatus.UNVERIFIED; // Default state
+
+    private LocalDateTime createdAt = LocalDateTime.now(); // For timeout check
 }
