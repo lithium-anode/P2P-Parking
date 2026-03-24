@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Parking Spots - P2P Parking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="#">P2P Parking - Owner Panel</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" th:href="@{/owner/dashboard}">Dashboard</a>
+                <a class="nav-link active" th:href="@{/owner/spots}">My Spots</a>
+                <a class="nav-link" th:href="@{/owner/earnings}">Earnings</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>My Parking Spots</h1>
+                <p>Manage your parking listings</p>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <a href="/owner/spots/add" class="btn btn-success mb-3">+ Add New Spot</a>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Your Parking Spots</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Location</th>
+                                        <th>Address</th>
+                                        <th>Hourly Rate</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="spot : ${spots}">
+                                        <td th:text="${spot.id}">1</td>
+                                        <td th:text="${spot.location}">Location</td>
+                                        <td th:text="${spot.address}">Address</td>
+                                        <td>$<span th:text="${#numbers.formatDecimal(spot.hourlyRate, 1, 2)}">0.00</span>/hr</td>
+                                        <td>
+                                            <span th:class="${spot.available ? 'badge bg-success' : 'badge bg-danger'}"
+                                                  th:text="${spot.available ? 'Available' : 'Occupied'}">Status</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a th:href="@{/owner/spots/{id}/edit(id=${spot.id})}" class="btn btn-primary">Edit</a>
+                                                <form th:action="@{/owner/spots/{id}/remove(id=${spot.id})}" method="post" style="display: inline;"
+                                                      onsubmit="return confirm('Are you sure you want to remove this spot?');">
+                                                    <button type="submit" class="btn btn-danger">Remove</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Reports - P2P Parking Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">P2P Parking - Admin Panel</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" th:href="@{/admin/dashboard}">Dashboard</a>
+                <a class="nav-link" th:href="@{/admin/users}">Users</a>
+                <a class="nav-link active" th:href="@{/admin/reports}">Reports</a>
+                <a class="nav-link" th:href="@{/admin/monitor}">Monitor</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>System Reports</h1>
+                <p>Comprehensive reports on system usage and performance</p>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>System Report</h5>
+                        <button onclick="window.print()" class="btn btn-sm btn-outline-primary">Print Report</button>
+                    </div>
+                    <div class="card-body">
+                        <pre th:text="${report}" style="white-space: pre-wrap; font-family: monospace; background-color: #f8f9fa; padding: 15px; border-radius: 5px;">Report content will appear here...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Report Types</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">User Registration Statistics</li>
+                            <li class="list-group-item">Booking Activity Reports</li>
+                            <li class="list-group-item">Revenue and Payment Reports</li>
+                            <li class="list-group-item">System Performance Metrics</li>
+                            <li class="list-group-item">Parking Spot Utilization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary" onclick="generateUserReport()">Generate User Report</button>
+                            <button class="btn btn-outline-success" onclick="generateBookingReport()">Generate Booking Report</button>
+                            <button class="btn btn-outline-info" onclick="generateRevenueReport()">Generate Revenue Report</button>
+                            <button class="btn btn-outline-secondary" onclick="exportReport()">Export to PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function generateUserReport() {
+            alert('User report generation feature coming soon!');
+        }
+
+        function generateBookingReport() {
+            alert('Booking report generation feature coming soon!');
+        }
+
+        function generateRevenueReport() {
+            alert('Revenue report generation feature coming soon!');
+        }
+
+        function exportReport() {
+            alert('PDF export feature coming soon!');
+        }
+    </script>
+</body>
+</html>

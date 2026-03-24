@@ -1,10 +1,12 @@
 package parking.project.model;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Entity
+@DiscriminatorValue("DRIVER")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Driver extends User {
