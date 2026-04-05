@@ -3,10 +3,6 @@ package parking.project.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-enum BookingStatus {
-    PENDING, CONFIRMED, CANCELLED, COMPLETED
-}
-
 @Entity
 @Table(name = "bookings")
 public class Booking {

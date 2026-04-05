@@ -29,7 +29,7 @@ public class BookingFacade {
         }
 
         // 2. Create and save the booking
-        Booking booking = bookingService.saveBooking(driver, spot, start, end);
+        Booking booking = bookingService.createBooking(driver, spot, start, end);
 
         // 3. Notify Observers (Behavioral Pattern logic) 
         observers.forEach(observer -> observer.onBookingStatusChange(booking));
