@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard - P2P Parking</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #ffffff; }
-        .status-badge { width: 100px; display: inline-block; }
-    </style>
+    <link href="/css/theme.css" rel="stylesheet">
 </head>
 <body class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-danger">Admin Control Center</h1>
-        <a href="/admin/reports" class="btn btn-outline-secondary">System Reports</a>
+        <h1 class="text-primary">Admin Control Center</h1>
+        <div>
+            <a href="/admin/reports" class="btn cyber-btn me-2">System Reports</a>
+            <a href="/logout" class="btn btn-outline-danger">Logout</a>
+        </div>
     </div>
 
     <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show">
@@ -20,8 +20,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-white">
+    <div class="card shadow-sm glass-card">
+        <div class="card-header">
             <h5 class="mb-0">System Users</h5>
         </div>
         <div class="table-responsive">

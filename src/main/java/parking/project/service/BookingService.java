@@ -17,6 +17,9 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final ParkingSpotRepository parkingSpotRepository;
+    
+    @Autowired
+    private PaymentService paymentService;
 
     @Autowired
     public BookingService(BookingRepository bookingRepository, ParkingSpotRepository parkingSpotRepository) {
@@ -24,7 +27,7 @@ public class BookingService {
         this.parkingSpotRepository = parkingSpotRepository;
     }
 
-    // Requirement: Verify availability before confirmation 
+    // Requirement: Verify availability before confirmation
     public boolean isSpotAvailable(ParkingSpot spot) {
         return spot.getIsAvailable();
     }
@@ -56,7 +59,10 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        // Requirement: Update availability status on return/checkout 
+        // Calculate and process payment
+        paymentService.processPaymentForBooking(booking);
+
+        // Requirement: Update availability status on return/checkout
         booking.setStatus(BookingStatus.COMPLETED);
         ParkingSpot spot = booking.getSpot();
         spot.setIsAvailable(true);

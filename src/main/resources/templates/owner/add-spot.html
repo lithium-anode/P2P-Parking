@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <title>Add New Spot - P2P Parking</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/theme.css" rel="stylesheet">
 </head>
-<body class="container py-5" style="background-color: #ffffff;">
+<body class="container py-5">
     <nav class="mb-4">
-        <a href="/owner/dashboard" class="text-decoration-none">← Back to Dashboard</a>
+        <a href="/owner/dashboard" class="text-decoration-none text-primary">← Back to Dashboard</a>
     </nav>
 
     <div class="row justify-content-center">
-        <div class="col-md-6 card p-4 shadow">
-            <h2 class="mb-4">List a Parking Spot</h2>
+        <div class="col-md-6 card p-4 glass-card shadow-sm">
+            <h2 class="mb-4 text-primary">List a Parking Spot</h2>
             <form action="/owner/add-spot" method="post">
                 <input type="hidden" name="ownerId" value="1"> <div class="mb-3">
                     <label class="form-label">Location Address</label>
@@ -33,7 +34,7 @@
                     <input type="number" step="0.01" name="price" class="form-control" value="10.00" required>
                 </div>
 
-                <button type="submit" class="btn btn-success btn-lg w-100">Create Listing</button>
+                <button type="submit" class="btn cyber-btn btn-lg w-100">Create Listing</button>
             </form>
         </div>
     </div>

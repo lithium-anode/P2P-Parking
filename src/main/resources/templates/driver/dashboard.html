@@ -4,38 +4,104 @@
     <meta charset="UTF-8">
     <title>Driver Dashboard - P2P Parking</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #ffffff; }
-        .card { border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    </style>
+    <link href="/css/theme.css" rel="stylesheet">
 </head>
 <body class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="text-primary">Driver Dashboard</h1>
-        <a href="/driver/search" class="btn btn-success">Find Parking</a>
+        <div>
+            <a href="/driver/search" class="btn cyber-btn me-2">Find Parking</a>
+            <a href="/logout" class="btn cyber-btn">Logout</a>
+        </div>
     </div>
 
     <div th:if="${param.success}" class="alert alert-success">
         Operation successful!
     </div>
 
+    <div class="live-status-card glass-card">
+        <div>
+            <div class="status-pill"><span class="status-dot"></span>Live Status</div>
+            <p class="mb-0 text-muted">Hourly charging is active. Demo mode billing is live.</p>
+        </div>
+        <div class="total-cost">
+            <small class="text-muted">Total Cost</small>
+            <div class="cost-amount">$<span th:text="${activeBookings != null and activeBookings.size() > 0 ? activeBookings[0].spot.pricePerHour : '0.00'}">0.00</span></div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-4">
-            <div class="card p-4">
+            <div class="glass-card p-4">
                 <h3>Profile</h3>
                 <hr>
                 <p><strong>Username:</strong> <span th:text="${driver.username}">User</span></p>
                 <p><strong>Email:</strong> <span th:text="${driver.email}">email@example.com</span></p>
-                <p><strong>Vehicle:</strong> <span th:text="${driver.vehicleModel}">Model</span> (<span th:text="${driver.vehicleNumber}">ABC-123</span>)</p>
+                <p><strong>Vehicle:</strong> <span th:text="${driver.vehicleModel}">Not Set</span> (<span th:text="${driver.vehicleNumber}">Not Set</span>)</p>
+                <p><strong>License:</strong> <span th:text="${driver.licenseNumber}">Not Set</span></p>
+            </div>
+
+            <div class="glass-card p-4 mt-3">
+                <h3>Register Vehicle</h3>
+                <hr>
+                <form th:action="@{/driver/update-vehicle}" method="post">
+                    <div class="mb-3">
+                        <label for="licenseNumber" class="form-label">License Number</label>
+                        <input type="text" class="form-control" id="licenseNumber" name="licenseNumber" th:value="${driver.licenseNumber}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="vehicleModel" class="form-label">Vehicle Model</label>
+                        <input type="text" class="form-control" id="vehicleModel" name="vehicleModel" placeholder="e.g. Honda Civic" th:value="${driver.vehicleModel}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="vehicleNumber" class="form-label">Vehicle Number</label>
+                        <input type="text" class="form-control" id="vehicleNumber" name="vehicleNumber" placeholder="e.g. ABC-1234" th:value="${driver.vehicleNumber}" required>
+                    </div>
+                    <button type="submit" class="btn cyber-btn w-100">Save Vehicle Details</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="glass-card p-4">
+        <h3>Current Bookings</h3>
+        <hr>
+
+        <!-- If bookings exist -->
+        <div th:if="${activeBookings != null and activeBookings.size() > 0}">
+            <div th:each="booking : ${activeBookings}" class="glass-border p-3 mb-3 rounded">
+                <p><strong>Spot ID:</strong> 
+                    <span th:text="${booking.spot.id}"></span>
+                </p>
+
+                <p><strong>Location:</strong> 
+                    <span th:text="${booking.spot.location}"></span>
+                </p>
+
+                <p><strong>Start Time:</strong> 
+                    <span th:text="${booking.startTime}"></span>
+                </p>
+
+                <p><strong>End Time:</strong> 
+                    <span th:text="${booking.endTime}"></span>
+                </p>
+
+                <p><strong>Status:</strong> 
+                    <span th:text="${booking.status}"></span>
+                </p>
+
+                <!-- Checkout button -->
+                <form th:action="@{/driver/checkout/{id}(id=${booking.id})}" method="post">
+                    <button class="btn cyber-btn btn-sm">Checkout</button>
+                </form>
             </div>
         </div>
 
-        <div class="col-md-8">
-            <div class="card p-4">
-                <h3>Current Bookings</h3>
-                <hr>
-                <p class="text-muted">You have no active bookings at the moment.</p>
-                </div>
+        <!-- If no bookings -->
+        <div th:if="${activeBookings == null or activeBookings.size()==0}">
+            <p class="text-muted">You have no active bookings at the moment.</p>
+        </div>
+
+            </div>
         </div>
     </div>
 </body>

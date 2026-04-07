@@ -15,9 +15,11 @@ public class UserService {
 
     // 1. New Method: Handle User Registration
     public void registerUser(User user, UserStatus status) {
+        System.out.println(">>> SERVICE CALLED");
         user.setStatus(status);
         user.setCreatedAt(LocalDateTime.now()); // For the 5-min timeout check
         userRepository.save(user); // Persist to database
+         System.out.println(">>> User saved successfully!");
     }
 
     // 2. New Method: Handle Login/Authentication

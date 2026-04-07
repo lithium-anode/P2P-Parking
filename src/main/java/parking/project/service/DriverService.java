@@ -19,4 +19,21 @@ public class DriverService {
         driver.setVehicleNumber(vehicleNo);
         driverRepository.save(driver);
     }
+
+    public void updateAllVehicleDetails(Long driverId, String licenseNumber, String vehicleModel, String vehicleNumber) {
+        Driver driver = driverRepository.findById(driverId)
+                .orElseThrow(() -> new IllegalArgumentException("Driver not found"));
+        
+        if (licenseNumber != null && !licenseNumber.isBlank()) {
+            driver.setLicenseNumber(licenseNumber);
+        }
+        if (vehicleModel != null && !vehicleModel.isBlank()) {
+            driver.setVehicleModel(vehicleModel);
+        }
+        if (vehicleNumber != null && !vehicleNumber.isBlank()) {
+            driver.setVehicleNumber(vehicleNumber);
+        }
+        
+        driverRepository.save(driver);
+    }
 }
