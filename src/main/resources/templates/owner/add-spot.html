@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Spot - P2P Parking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container py-5" style="background-color: #ffffff;">
+    <nav class="mb-4">
+        <a href="/owner/dashboard" class="text-decoration-none">← Back to Dashboard</a>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 card p-4 shadow">
+            <h2 class="mb-4">List a Parking Spot</h2>
+            <form action="/owner/add-spot" method="post">
+                <input type="hidden" name="ownerId" value="1"> <div class="mb-3">
+                    <label class="form-label">Location Address</label>
+                    <input type="text" name="location" class="form-control" placeholder="123 Main St, City" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Spot Type</label>
+                    <select name="type" class="form-select">
+                        <option value="STANDARD">Standard</option>
+                        <option value="EV">EV Charging (+ Premium)</option>
+                        <option value="PREMIUM">Premium (1.5x Rate)</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Base Price Per Hour ($)</label>
+                    <input type="number" step="0.01" name="price" class="form-control" value="10.00" required>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg w-100">Create Listing</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
