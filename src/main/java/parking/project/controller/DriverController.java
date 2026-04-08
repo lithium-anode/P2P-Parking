@@ -134,9 +134,9 @@ public class DriverController {
                 selectedStrategy
             );
             return "redirect:/driver/history";
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             // [Design Pattern: State]
-            // Handles cases where the spot is already Reserved or Occupied
+            // Handles cases where the spot is already Reserved or Occupied or if vehicle type is incompatible
             return "redirect:/driver/search?error=" + e.getMessage();
         }
     }

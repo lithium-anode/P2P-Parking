@@ -47,7 +47,13 @@ public class BookingService {
     public Booking createBooking(Driver driver, ParkingSpot spot, LocalDateTime start, LocalDateTime end, PricingStrategy strategy) {
         // [Goal Alignment: Vehicle Compatibility]
         if (!isCompatible(driver, spot)) {
-            throw new IllegalArgumentException("Driver's vehicle is not compatible with this spot type.");
+            throw new IllegalArgumentException("Incompatible vehicle type");
+        }
+
+        // [Design Pattern: State - Logic]
+        // Explicitly check availability to provide the specific error string for the UI
+        if (!(spot.getCurrentState() instanceof AvailableState)) {
+            throw new IllegalStateException("Spot is not available for booking");
         }
 
         // [Design Pattern: State - Logic]

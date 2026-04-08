@@ -4,7 +4,24 @@
 <body>
     <div th:replace="~{fragments/header :: navbar}"></div>
     <div class="container">
-        <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">Spot already reserved</div>
+        <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center" role="alert">
+            <div th:switch="${param.error[0]}">
+                <span th:case="'Spot is not available for booking'">
+                    <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                    <strong>Booking Failed:</strong> This spot was just taken. Please choose a different location.
+                </span>
+
+                <span th:case="'Incompatible vehicle type'">
+                    <i class="bi bi-ev-front-fill me-2"></i>
+                    <strong>Vehicle Mismatch:</strong> Your vehicle does not support the requirements for this spot.
+                </span>
+
+                <span th:case="*">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <span th:text="${param.error}">General Error</span>
+                </span>
+            </div>
+        </div>
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Available Parking Spots</h2>
             <a th:href="@{/driver/history}" class="btn btn-outline-primary">View My Bookings</a>
