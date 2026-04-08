@@ -5,22 +5,29 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import parking.project.model.Payment;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
+/**
+ * [GRASP: Information Expert]
+ * The expert for financial transaction records.
+ *
+ * [Goal Alignment: Usage Reports]
+ * Provides the data needed for Administrators to oversee system operations 
+ * and generate periodic financial reports.
+ */
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
+    /**
+     * Finds payments within a specific timeframe for reporting.
+     */
+    List<Payment> findByPaymentDateBetween(LocalDateTime start, LocalDateTime end);
 
-    // Supports finding a specific payment record for a booking 
-    Optional<Payment> findByBookingId(Long bookingId);
-
-    // Essential for Member C: Allows Drivers to view their personal payment history [cite: 30, 45]
-    List<Payment> findByBookingDriverId(Long driverId);
-
-    // Essential for Member B: Allows Space Owners to view earnings from their specific spots 
-    List<Payment> findByBookingSpotOwnerId(Long ownerId);
-
-    // Custom query to calculate total earnings for a specific Space Owner [cite: 22, 30]
-    @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.booking.spot.owner.id = :ownerId AND p.status = 'PAID'")
-    Double getTotalEarningsByOwner(@Param("ownerId") Long ownerId);
+    /**
+     * [Goal Alignment: Tracking Earnings]
+     * Custom query to find all payments associated with a specific Space Owner's 
+     * spots to calculate their total revenue.
+     */
+    @Query("SELECT p FROM Payment p WHERE p.booking.parkingSpot.owner.id = :ownerId")
+    List<Payment> findByOwnerId(@Param("ownerId") Long ownerId);
 }
