@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header-css}"><title>My Bookings</title></head>
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    <div class="container">
+        <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}"></div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>My Booking History</h2>
+            <a th:href="@{/driver/search}" class="btn btn-outline-secondary">Back to Search</a>
+        </div>
+        <table class="table bg-white shadow-sm rounded">
+            <thead>
+                <tr>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Location</th>
+                    <th>Cost</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="booking : ${bookings}">
+                    <td th:text="${#temporals.format(booking.startTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${#temporals.format(booking.endTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${booking.parkingSpot.location}"></td>
+                    <td th:text="${#numbers.formatCurrency(booking.totalCost)}"></td>
+                    <td th:text="${booking.status}"></td>
+                    <td>
+                        <form th:if="${booking.status.name() == 'PENDING' or booking.status.name() == 'CONFIRMED'}" th:action="@{/driver/cancel/{id}(id=${booking.id})}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Cancel this booking?')">Cancel</button>
+                        </form>
+                        <form th:if="${booking.status.name() == 'CONFIRMED'}" th:action="@{/driver/checkout/{id}(id=${booking.id})}" method="post" style="display:inline;">
+                            <div class="input-group input-group-sm mb-2">
+                                <select name="paymentMethod" class="form-select" required>
+                                    <option value="" disabled selected>Method</option>
+                                    <option th:each="method : ${T(parking.project.model.enums.PaymentMethod).values()}" 
+                                            th:value="${method}" th:text="${method}"></option>
+                                </select>
+                                <button type="submit" class="btn btn-success">Checkout</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p th:if="${#lists.isEmpty(bookings)}" class="text-muted">No bookings found.</p>
+    </div>
+</body>
+</html>

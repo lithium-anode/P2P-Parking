@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header-css}">
+    <title>System Reports - Admin</title>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>System Usage Reports</h2>
+            <a th:href="@{/admin/users}" class="btn btn-outline-secondary">Back to User Management</a>
+            <div class="text-end">
+                <span class="text-muted">Total Platform Revenue:</span>
+                <h3 class="text-success" th:text="${#numbers.formatCurrency(totalRevenue)}">$0.00</h3>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 text-center p-3">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted">Total Transactions</h6>
+                        <h2 th:text="${payments.size()}">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 text-center p-3">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted">Active Listings</h6>
+                        <h2 th:text="${totalSpots}">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 text-center p-3">
+                    <div class="card-body">
+                        <h6 class="text-uppercase text-muted">Registered Users</h6>
+                        <h2 th:text="${totalUsers}">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0">Recent Transaction History</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Driver</th>
+                            <th>Spot Location</th>
+                            <th>Payment Method</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="payment : ${payments}">
+                            <td th:text="${#temporals.format(payment.paymentDate, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td th:text="${payment.booking.driver.username}"></td>
+                            <td th:text="${payment.booking.parkingSpot.location}"></td>
+                            <td>
+                                <span class="badge bg-secondary" th:text="${payment.paymentMethod}"></span>
+                            </td>
+                            <td class="text-end fw-bold" th:text="${#numbers.formatCurrency(payment.amount)}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(payments)}">
+                            <td colspan="5" class="text-center py-4 text-muted">No transactions found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
