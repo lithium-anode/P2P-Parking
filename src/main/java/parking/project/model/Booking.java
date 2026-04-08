@@ -1,8 +1,19 @@
 package parking.project.model;
 
 import jakarta.persistence.*;
+import parking.project.model.enums.BookingStatus;
+
 import java.time.LocalDateTime;
 
+/**
+ * [GRASP: Information Expert]
+ * This class is the Information Expert for reservation details, including 
+ * duration, cost, and the relationship between the Driver and the ParkingSpot.
+ *
+ * [Goal Alignment: Transaction Management]
+ * Supports the requirement to maintain accurate records of bookings  
+ * and ensures that the system can verify availability.
+ */
 @Entity
 @Table(name = "bookings")
 public class Booking {
@@ -11,46 +22,59 @@ public class Booking {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "driver_id")
-    private User driver; 
+    @JoinColumn(name = "driver_id", nullable = false)
+    private Driver driver;
 
     @ManyToOne
-    @JoinColumn(name = "spot_id")
-    private ParkingSpot spot; 
+    @JoinColumn(name = "spot_id", nullable = false)
+    private ParkingSpot parkingSpot;
 
+    @Column(nullable = false)
     private LocalDateTime startTime;
+
+    @Column(nullable = false)
     private LocalDateTime endTime;
 
+    @Column(nullable = false)
+    private double totalCost;
+
+    /**
+     * [Design Pattern: State Integration]
+     * The status of the booking reflects the current phase of the reservation 
+     * (e.g., PENDING, CONFIRMED, COMPLETED).
+     */
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
-    // Standard Default Constructor
-    public Booking() {}
+    public Booking() { }
 
-    // Parameterized Constructor
-    public Booking(User driver, ParkingSpot spot, LocalDateTime startTime, LocalDateTime endTime, BookingStatus status) {
+    public Booking(Driver driver, ParkingSpot parkingSpot, LocalDateTime startTime, LocalDateTime endTime, double totalCost) {
         this.driver = driver;
-        this.spot = spot;
+        this.parkingSpot = parkingSpot;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.status = status;
+        this.totalCost = totalCost;
+        this.status = BookingStatus.PENDING;
     }
 
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public User getDriver() { return driver; }
-    public void setDriver(User driver) { this.driver = driver; }
+    public Driver getDriver() { return driver; }
+    public void setDriver(Driver driver) { this.driver = driver; }
 
-    public ParkingSpot getSpot() { return spot; }
-    public void setSpot(ParkingSpot spot) { this.spot = spot; }
+    public ParkingSpot getParkingSpot() { return parkingSpot; }
+    public void setParkingSpot(ParkingSpot parkingSpot) { this.parkingSpot = parkingSpot; }
 
     public LocalDateTime getStartTime() { return startTime; }
     public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
 
     public LocalDateTime getEndTime() { return endTime; }
     public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+
+    public double getTotalCost() { return totalCost; }
+    public void setTotalCost(double totalCost) { this.totalCost = totalCost; }
 
     public BookingStatus getStatus() { return status; }
     public void setStatus(BookingStatus status) { this.status = status; }
