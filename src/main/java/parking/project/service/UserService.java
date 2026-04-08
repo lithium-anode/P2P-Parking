@@ -1,56 +1,56 @@
 package parking.project.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import parking.project.model.*;
-import parking.project.repository.UserRepository;
-import java.time.LocalDateTime;
-import java.time.Duration;
 
+import parking.project.dto.UserRegistrationForm;
+import parking.project.model.User;
+import parking.project.model.Driver;
+import parking.project.patterns.creational.factory.UserFactory;
+import parking.project.repository.UserRepository;
+
+import java.util.Optional;
+
+/**
+ * [GRASP: Controller]
+ * Coordinates user-related system events between the web layer and the data layer.
+ *
+ * [Design Pattern: Factory Method - Client]
+ * Uses the UserFactory to instantiate role-specific User objects without 
+ * coupling the service to concrete subclasses like Driver or SpaceOwner.
+ */
 @Service
 public class UserService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
-    private UserRepository userRepository;
-
-    // Transition: Unverified -> Active
-    public void verifyUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
-        if (user.getStatus() == UserStatus.UNVERIFIED) {
-            user.setStatus(UserStatus.ACTIVE);
-            userRepository.save(user);
-        }
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    // Transition: Active <-> Suspended
-    public void updateSuspensionStatus(Long userId, boolean isFlagged) {
-        User user = userRepository.findById(userId).orElseThrow();
-        user.setStatus(isFlagged ? UserStatus.SUSPENDED : UserStatus.ACTIVE);
-        userRepository.save(user);
+    /**
+     * [Goal Alignment: Authentication - Registration]
+     * Creates a new user using the Factory pattern and persists them to the database.
+     */
+    public User registerUser(UserRegistrationForm form) {
+        String encodedPassword = passwordEncoder.encode(form.getPassword());
+        User newUser = UserFactory.createUser(form.getUsername(), encodedPassword, form.getEmail(), form.getRole());
+
+        if (newUser instanceof Driver) {
+            ((Driver) newUser).setVehicleTypes(form.getVehicleTypes());
+        }
+
+        return userRepository.save(newUser);
     }
 
-    // Transition: Active -> Deactivated
-    public String deleteAccount(Long userId, boolean hasActiveBookings) {
-        User user = userRepository.findById(userId).orElseThrow();
-        
-        // Guard Condition: [no active bookings]
-        if (hasActiveBookings) {
-            return "Cannot delete account: You have active bookings.";
-        }
-        
-        user.setStatus(UserStatus.DEACTIVATED);
-        userRepository.save(user);
-        return "Account successfully deactivated.";
-    }
-
-    // Logic for [verification timeout > 5 mins]
-    public void checkVerificationTimeout(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
-        if (user.getStatus() == UserStatus.UNVERIFIED) {
-            long minutes = Duration.between(user.getCreatedAt(), LocalDateTime.now()).toMinutes();
-            if (minutes > 5) {
-                user.setStatus(UserStatus.DEACTIVATED);
-                userRepository.save(user);
-            }
-        }
+    /**
+     * [Goal Alignment: Authentication - Login]
+     * Retrieves a user by their unique username to facilitate secure login.
+     */
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }

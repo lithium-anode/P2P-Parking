@@ -2,66 +2,104 @@ package parking.project.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import parking.project.model.Booking;
-import parking.project.model.BookingStatus;
-import parking.project.model.ParkingSpot;
-import parking.project.model.User;
+
+import jakarta.transaction.Transactional;
+import parking.project.model.*;
+import parking.project.model.enums.BookingStatus;
+import parking.project.model.enums.PaymentMethod;
+import parking.project.model.enums.SpotType;
+import parking.project.model.enums.VehicleType;
+import parking.project.patterns.behavioral.state.AvailableState;
+import parking.project.patterns.behavioral.strategy.PricingStrategy;
 import parking.project.repository.BookingRepository;
 import parking.project.repository.ParkingSpotRepository;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
+/**
+ * [GRASP: Creator]
+ * Responsible for creating and managing the lifecycle of Booking objects.
+ *
+ * [GRASP: High Cohesion]
+ * Centralizes all logic related to the parking lifecycle, including 
+ * compatibility checks, availability verification, and cost calculation.
+ */
 @Service
 public class BookingService {
-
     private final BookingRepository bookingRepository;
     private final ParkingSpotRepository parkingSpotRepository;
+    private final PaymentService paymentService;
 
     @Autowired
-    public BookingService(BookingRepository bookingRepository, ParkingSpotRepository parkingSpotRepository) {
+    public BookingService(BookingRepository bookingRepository, ParkingSpotRepository parkingSpotRepository, PaymentService paymentService) {
         this.bookingRepository = bookingRepository;
         this.parkingSpotRepository = parkingSpotRepository;
+        this.paymentService = paymentService;
     }
 
-    // Requirement: Verify availability before confirmation 
-    public boolean isSpotAvailable(ParkingSpot spot) {
-        return spot.getIsAvailable();
-    }
-
-    @Transactional
-    public Booking createBooking(User driver, ParkingSpot spot, LocalDateTime start, LocalDateTime end) {
-        // Double-check availability logic [cite: 8]
-        if (!isSpotAvailable(spot)) {
-            throw new IllegalStateException("The selected parking spot is no longer available.");
+    /**
+     * [Goal Alignment: Double-Booking Prevention]
+     * [Design Pattern: State - Context Management]
+     * Verifies that a spot is available and uses the State pattern to transition 
+     * it to 'RESERVED' before confirming the booking.
+     */
+    public Booking createBooking(Driver driver, ParkingSpot spot, LocalDateTime start, LocalDateTime end, PricingStrategy strategy) {
+        // [Goal Alignment: Vehicle Compatibility]
+        if (!isCompatible(driver, spot)) {
+            throw new IllegalArgumentException("Driver's vehicle is not compatible with this spot type.");
         }
 
-        // Initialize the booking record [cite: 2]
-        Booking booking = new Booking();
-        booking.setDriver(driver);
-        booking.setSpot(spot);
-        booking.setStartTime(start);
-        booking.setEndTime(end);
+        // [Design Pattern: State - Logic]
+        // In a real system, you would load the currentState based on the DB status.
+        // Transitioning to Reserved ensures double-bookings do not occur.
+        spot.getCurrentState().handleReserve(spot);
+
+        // Calculate cost using the Strategy Pattern
+        int hours = (int) Math.ceil(Duration.between(start, end).toMinutes() / 60.0);
+        double totalCost = spot.calculateCost(hours, strategy);
+
+        Booking booking = new Booking(driver, spot, start, end, totalCost);
         booking.setStatus(BookingStatus.CONFIRMED);
 
-        // Update spot status to unavailable [cite: 9]
-        spot.setIsAvailable(false);
         parkingSpotRepository.save(spot);
-
         return bookingRepository.save(booking);
     }
 
+    /**
+     * [Goal Alignment: Checkout Logic]
+     * [Design Pattern: State - Logic]
+     * Updates the spot availability during checkout by vacating the spot.
+     */
     @Transactional
-    public void completeCheckout(Long bookingId) {
-        Booking booking = bookingRepository.findById(bookingId)
-            .orElseThrow(() -> new RuntimeException("Booking not found"));
-
-        // Requirement: Update availability status on return/checkout 
+    public void processCheckout(Booking booking, PaymentMethod paymentMethod) {
         booking.setStatus(BookingStatus.COMPLETED);
-        ParkingSpot spot = booking.getSpot();
-        spot.setIsAvailable(true);
+        
+        ParkingSpot spot = booking.getParkingSpot();
+        spot.getCurrentState().handleVacate(spot); // Transition back to Available
 
+        paymentService.processPayment(booking, paymentMethod);
         parkingSpotRepository.save(spot);
         bookingRepository.save(booking);
+    }
+
+    /**
+     * Helper to ensure Driver has the correct vehicle for the spot.
+     * e.g., Electric vehicles for Electric Charging spots.
+     */
+    private boolean isCompatible(Driver driver, ParkingSpot spot) {
+        if (spot.getSpotType() == SpotType.ELECTRIC_CHARGING) {
+            return driver.getVehicleTypes().contains(VehicleType.ELECTRIC);
+        }
+        return true; // Simplified for basic types
+    }
+
+    public void cancelBooking(Booking booking) {
+        if (booking.getStatus() != BookingStatus.PENDING && booking.getStatus() != BookingStatus.CONFIRMED) {
+            throw new IllegalStateException("Only pending or confirmed bookings can be cancelled.");
+        }
+        ParkingSpot spot = booking.getParkingSpot();
+        spot.setCurrentState(new AvailableState());  // Free the spot
+        bookingRepository.delete(booking);
     }
 }

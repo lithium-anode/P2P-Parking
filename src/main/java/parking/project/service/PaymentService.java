@@ -1,33 +1,72 @@
 package parking.project.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import parking.project.model.*;
+import org.springframework.transaction.annotation.Transactional;
+import parking.project.model.Booking;
+import parking.project.model.Payment;
+import parking.project.model.SpaceOwner;
+import parking.project.model.enums.PaymentMethod;
 import parking.project.repository.PaymentRepository;
-import parking.project.patterns.strategy.PricingStrategy;
-import java.time.Duration;
-import java.time.LocalDateTime;
+import parking.project.repository.SpaceOwnerRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * [GRASP: Creator]
+ * This service is responsible for creating Payment objects. It has the 
+ * necessary information (Booking and PaymentMethod) to initialize a transaction.
+ * * [GRASP: High Cohesion]
+ * Centralizes all financial logic, ensuring that payment processing and 
+ * earning updates are handled in a single location.
+ */
 @Service
 public class PaymentService {
     private final PaymentRepository paymentRepository;
+    private final SpaceOwnerRepository spaceOwnerRepository;
 
-    public PaymentService(PaymentRepository paymentRepository) {
+    @Autowired
+    public PaymentService(PaymentRepository paymentRepository, SpaceOwnerRepository spaceOwnerRepository) {
         this.paymentRepository = paymentRepository;
+        this.spaceOwnerRepository = spaceOwnerRepository;
     }
 
-    public Payment processPayment(Booking booking, PricingStrategy strategy) {
-        // Calculate duration in minutes
-        long minutes = Duration.between(booking.getStartTime(), booking.getEndTime()).toMinutes();
+    /**
+     * [Goal Alignment: Tracking Earnings]
+     * Processes a payment for a completed booking and updates the 
+     * Space Owner's total earnings.
+     */
+    @Transactional
+    public Payment processPayment(Booking booking, PaymentMethod method) {
+        // [GRASP: Creator]
+        // Create the payment record associated with the booking
+        Payment payment = new Payment(booking, booking.getTotalCost(), method);
         
-        // Use strategy to calculate amount based on owner's rate 
-        double totalAmount = strategy.calculatePrice(booking.getSpot().getPricePerHour(), minutes);
+        // Update the Space Owner's earnings
+        SpaceOwner owner = booking.getParkingSpot().getOwner();
+        double updatedEarnings = owner.getTotalEarnings() + booking.getTotalCost();
+        owner.setTotalEarnings(updatedEarnings);
 
-        Payment payment = new Payment();
-        payment.setBooking(booking);
-        payment.setAmount(totalAmount);
-        payment.setPaymentTime(LocalDateTime.now());
-        payment.setStatus("PAID");
+        // Persist both the payment and the updated owner data
+        spaceOwnerRepository.save(owner);
+        return paymentRepository.save(payment);
+    }
 
-        return paymentRepository.save(payment); // Persist data 
+    /**
+     * [Goal Alignment: Usage Reports]
+     * Retrieves financial data for Administrators to generate reports 
+     * within a specific timeframe.
+     */
+    public List<Payment> getPaymentsByPeriod(LocalDateTime start, LocalDateTime end) {
+        return paymentRepository.findByPaymentDateBetween(start, end);
+    }
+
+    /**
+     * [Goal Alignment: Space Owner Control]
+     * Allows owners to view their specific transaction history and total revenue.
+     */
+    public List<Payment> getOwnerEarningsReport(Long ownerId) {
+        return paymentRepository.findByOwnerId(ownerId);
     }
 }
