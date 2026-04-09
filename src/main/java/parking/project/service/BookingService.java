@@ -17,14 +17,16 @@ import parking.project.repository.ParkingSpotRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-/**
- * [GRASP: Creator]
- * Responsible for creating and managing the lifecycle of Booking objects.
- *
- * [GRASP: High Cohesion]
- * Centralizes all logic related to the parking lifecycle, including 
- * compatibility checks, availability verification, and cost calculation.
- */
+/*
+    [GRASP: Information Expert]
+    Co-ordinates data from Driver, ParkingSpot, and Payment services to manage
+    the booking lifecycle and ensure a seamless parking experience.
+    [GRASP: Creator]
+    Responsible for creating and managing the lifecycle of Booking objects.
+    [GRASP: High Cohesion]
+    Centralizes all logic related to the parking lifecycle, including 
+    compatibility checks, availability verification, and cost calculation.
+*/
 @Service
 public class BookingService {
     private final BookingRepository bookingRepository;
@@ -38,26 +40,20 @@ public class BookingService {
         this.paymentService = paymentService;
     }
 
-    /**
-     * [Goal Alignment: Double-Booking Prevention]
-     * [Design Pattern: State - Context Management]
-     * Verifies that a spot is available and uses the State pattern to transition 
-     * it to 'RESERVED' before confirming the booking.
-     */
+    // Goal: Double-Booking Prevention
     public Booking createBooking(Driver driver, ParkingSpot spot, LocalDateTime start, LocalDateTime end, PricingStrategy strategy) {
-        // [Goal Alignment: Vehicle Compatibility]
+        // Check Vehicle Compatibility
         if (!isCompatible(driver, spot)) {
             throw new IllegalArgumentException("Incompatible vehicle type");
         }
 
-        // [Design Pattern: State - Logic]
+        // [Design Pattern: Behavioral - State]
         // Explicitly check availability to provide the specific error string for the UI
         if (!(spot.getCurrentState() instanceof AvailableState)) {
             throw new IllegalStateException("Spot is not available for booking");
         }
 
-        // [Design Pattern: State - Logic]
-        // In a real system, you would load the currentState based on the DB status.
+        // [Design Pattern: Behavioral - State]
         // Transitioning to Reserved ensures double-bookings do not occur.
         spot.getCurrentState().handleReserve(spot);
 
@@ -72,11 +68,9 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    /**
-     * [Goal Alignment: Checkout Logic]
-     * [Design Pattern: State - Logic]
-     * Updates the spot availability during checkout by vacating the spot.
-     */
+    // Goal: Checkout Logic
+    // [Design Pattern: State - Logic]
+    // Updates the spot availability during checkout by vacating the spot.
     @Transactional
     public void processCheckout(Booking booking, PaymentMethod paymentMethod) {
         booking.setStatus(BookingStatus.COMPLETED);
@@ -89,10 +83,6 @@ public class BookingService {
         bookingRepository.save(booking);
     }
 
-    /**
-     * Helper to ensure Driver has the correct vehicle for the spot.
-     * e.g., Electric vehicles for Electric Charging spots.
-     */
     private boolean isCompatible(Driver driver, ParkingSpot spot) {
         if (spot.getSpotType() == SpotType.ELECTRIC_CHARGING) {
             return driver.getVehicleTypes().contains(VehicleType.ELECTRIC);

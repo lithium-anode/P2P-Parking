@@ -11,12 +11,12 @@ import parking.project.repository.UserRepository;
 
 import java.util.Collections;
 
-/**
- * [GRASP: Information Expert]
- * This service is the expert for retrieving security-related user information.
- * It interacts with the UserRepository to provide the data required by 
- * the Spring Security authentication provider.
- */
+/*
+    [GRASP: Information Expert]
+    Retrieves security-related user information.
+    Iinteracts with the UserRepository to provide the data required by 
+    the Spring Security authentication provider.
+*/
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
@@ -25,12 +25,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-
-    /**
-     * [Goal Alignment: Authentication Mechanisms]
-     * Loads the user from the database by username and maps their UserRole 
-     * to a Spring Security GrantedAuthority.
-     */
+    
+    // Goal: Authentication Mechanisms
+    // Loads the user from the database by username and maps their UserRole 
+    // to a Spring Security GrantedAuthority.
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)

@@ -12,19 +12,11 @@ import parking.project.repository.PaymentRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * [GRASP: Information Expert]
- * This service is the Information Expert for system-wide oversight. It coordinates 
- * data from User, ParkingSpot, and Payment repositories to provide a 
- * comprehensive view of the platform's health.
- * * [GRASP: High Cohesion]
- * Centralizes all administrative business logic, including user management, 
- * listing oversight, and report generation.
- * * [Design Pattern: Proxy - Target]
- * The methods in this service are the intended targets for the 'VerifyProxy'. 
- * The Proxy ensures that only users with the ADMIN role can execute these 
- * sensitive operations.
- */
+/*
+    [GRASP: Information Expert]
+    Co-ordinates data from User, ParkingSpot, and Payment repositories to provide a
+    comprehensive view of the platform's health.
+*/
 @Service
 public class AdminService {
     private final UserRepository userRepository;
@@ -40,47 +32,27 @@ public class AdminService {
         this.paymentRepository = paymentRepository;
     }
 
-    /**
-     * [Goal Alignment: User Management]
-     * Provides a full registry of all users (Drivers, Owners, Admins) for 
-     * administrative review and account control.
-     */
+    // Goal: Provides a full registry of all users
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    /**
-     * [Goal Alignment: Smooth Operation]
-     * Allows Administrators to deactivate or remove accounts that violate 
-     * system terms of service.
-     */
+    // Goal: Allows Administrators to deactivate or remove accounts
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
     }
 
-    /**
-     * [Goal Alignment: Listing Oversight]
-     * Allows the Administrator to monitor all urban parking resources 
-     * registered in the system.
-     */
+    // Goal: Provides a full registry of all parking spots
     public List<ParkingSpot> getAllParkingSpots() {
         return parkingSpotRepository.findAll();
     }
 
-    /**
-     * [Goal Alignment: Usage Reports]
-     * Aggregates financial data within a specific timeframe to generate 
-     * platform-wide usage and revenue reports.
-     */
+    // Goal: Generates usage reports based on payment data
     public List<Payment> generateUsageReport(LocalDateTime start, LocalDateTime end) {
         return paymentRepository.findByPaymentDateBetween(start, end);
     }
 
-    /**
-     * [Goal Alignment: Efficient Management]
-     * Provides analytics on the total number of transactions and total 
-     * system revenue.
-     */
+    // Goal: Provides analytics on the total number of transactions and total system revenue
     public double calculateTotalSystemRevenue() {
         List<Payment> allPayments = paymentRepository.findAll();
         double total = 0;

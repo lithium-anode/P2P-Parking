@@ -13,14 +13,14 @@ import parking.project.repository.SpaceOwnerRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * [GRASP: Creator]
- * This service is responsible for creating Payment objects. It has the 
- * necessary information (Booking and PaymentMethod) to initialize a transaction.
- * * [GRASP: High Cohesion]
- * Centralizes all financial logic, ensuring that payment processing and 
- * earning updates are handled in a single location.
- */
+/*
+    [GRASP: Creator]
+    Creates Payment objects. It has the necessary information
+    (Booking and PaymentMethod) to initialize a transaction.
+    [GRASP: High Cohesion]
+    Centralizes all financial logic, ensuring that payment processing and 
+    earning updates are handled in a single location.
+*/
 @Service
 public class PaymentService {
     private final PaymentRepository paymentRepository;
@@ -32,11 +32,9 @@ public class PaymentService {
         this.spaceOwnerRepository = spaceOwnerRepository;
     }
 
-    /**
-     * [Goal Alignment: Tracking Earnings]
-     * Processes a payment for a completed booking and updates the 
-     * Space Owner's total earnings.
-     */
+    // Goal: Tracking Earnings
+    // Processes a payment for a completed booking and updates the
+    // Space Owner's total earnings.
     @Transactional
     public Payment processPayment(Booking booking, PaymentMethod method) {
         // [GRASP: Creator]
@@ -53,19 +51,15 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-    /**
-     * [Goal Alignment: Usage Reports]
-     * Retrieves financial data for Administrators to generate reports 
-     * within a specific timeframe.
-     */
+    // Goal: Usage Reports
+    // Retrieves financial data for Administrators to generate reports
+    // within a specific timeframe.
     public List<Payment> getPaymentsByPeriod(LocalDateTime start, LocalDateTime end) {
         return paymentRepository.findByPaymentDateBetween(start, end);
     }
 
-    /**
-     * [Goal Alignment: Space Owner Control]
-     * Allows owners to view their specific transaction history and total revenue.
-     */
+    // Goal: Space Owner Control
+    // Allows owners to view their specific transaction history and total revenue.
     public List<Payment> getOwnerEarningsReport(Long ownerId) {
         return paymentRepository.findByOwnerId(ownerId);
     }
