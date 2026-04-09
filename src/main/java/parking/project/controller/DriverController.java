@@ -24,12 +24,12 @@ import parking.project.service.UserService;
 import parking.project.repository.ParkingSpotRepository;
 import parking.project.repository.BookingRepository;
 
-/**
- * [GRASP: Controller]
- * Coordinates driver-specific activities such as searching for spots and initiating bookings.
- * * [Design Pattern: Proxy - Protection Proxy]
- * Uses VerifyProxy to ensure only users with the 'DRIVER' role can access these methods.
- */
+/*
+    [GRASP: Controller]
+    Goal: Coordinate driver-specific activities - searching for spots and initiating bookings.
+    [Design Pattern: Structural - Proxy]
+    Ensures only drivers can access these operations by using the VerifyProxy for role verification.
+*/
 @Controller
 @RequestMapping("/driver")
 public class DriverController {
@@ -52,17 +52,11 @@ public class DriverController {
         this.userService = userService;
     }
 
-    /**
-     * [Goal Alignment: Driver Search]
-     * Allows drivers to search for parking spots by location or type.
-     */
+    // Goal: Search Spots
     @GetMapping("/search")
     public String searchSpots(@RequestParam(required = false) String location, 
                               @RequestParam(required = false) SpotType type, 
                               Model model) {
-        // In a real implementation, 'currentUser' would be retrieved from the Session
-        // if (!verifyProxy.isDriver(currentUser)) return "error/403";
-
         if (location != null) {
             model.addAttribute("spots", spotRepository.findByLocationContainingIgnoreCaseAndActiveTrue(location));
         } else if (type != null) {
@@ -71,72 +65,62 @@ public class DriverController {
         return "driver/search";
     }
 
-    /**
-     * [GRASP: Pure Fabrication]
-     * Logic to decide which pricing strategy to apply.
-     */
+    // [GRASP: Pure Fabrication]
+    // Logic to decide which pricing strategy to apply.
     private PricingStrategy determineStrategy(ParkingSpot spot) {
         LocalDateTime now = LocalDateTime.now();
-        
-        // 1. Check for Electric Charging spots
+
+        // Check for Electric Charging spots
         if (spot.getSpotType() == SpotType.ELECTRIC_CHARGING) {
             return new ElectricChargingPricingStrategy();
         }
         
-        // 2. Check for Peak Hours (e.g., 8 AM - 10 AM or 5 PM - 7 PM)
+        // Check for Peak Hours (e.g., 8 AM - 10 AM or 5 PM - 7 PM)
         int hour = now.getHour();
         if ((hour >= 8 && hour <= 10) || (hour >= 17 && hour <= 19)) {
             return new PeakHourPricingStrategy();
         }
-        
-        // 3. Default to Standard
+
+        // Default to Standard
         return new StandardPricingStrategy();
     }
 
-    /**
-     * [GRASP: Controller]
-     * Handles the booking event by coordinating between the Driver, the selected Spot, 
-     * and the BookingService.
-     */
+    // [GRASP: Controller]
+    // Handles the booking event by coordinating between the Driver, the selected Spot,
+    // BookingService, and the chosen PricingStrategy.
     @PostMapping("/book")
     public String bookSpot(@RequestParam Long spotId, 
-                        @RequestParam int duration, // New parameter from search.html
+                        @RequestParam int duration,
                         Authentication authentication) {
         String username = authentication.getName();
         Driver currentUser = (Driver) userService.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        /**
-         * [Design Pattern: Proxy]
-         * Protects the booking functionality by verifying the user's role.
-         */
+        // [Design Pattern: Proxy]
+        // Protects the booking functionality by verifying the user's role.
         if (!verifyProxy.isDriver(currentUser)) {
             return "redirect:/login?error=Unauthorized";
         }
 
         ParkingSpot spot = spotRepository.findById(spotId).orElseThrow();
         
-        // [Design Pattern: Strategy Selection]
-        // Selects the appropriate pricing algorithm based on spot type or time
+        // [Design Pattern: Behavioral - Strategy]
+        // Selects the appropriate pricing model based on spot type or time
         PricingStrategy selectedStrategy = determineStrategy(spot);
 
+        // Goal: sets booking end time and calculates cost based on duration and strategy
         try {
-            /**
-             * [Goal Alignment: Driver Search & Booking]
-             * Uses the user-provided duration to set the end time of the booking, 
-             * ensuring the total cost is calculated accurately.
-             */
             bookingService.createBooking(
                 currentUser, 
                 spot, 
                 LocalDateTime.now(),
-                LocalDateTime.now().plusHours(duration), // Use dynamic duration
+                LocalDateTime.now().plusHours(duration),
                 selectedStrategy
             );
             return "redirect:/driver/history";
         } catch (IllegalStateException | IllegalArgumentException e) {
-            // [Design Pattern: State]
-            // Handles cases where the spot is already Reserved or Occupied or if vehicle type is incompatible
+            // [Design Pattern: Behavioral - State]
+            // Handles cases where the spot is already Reserved/Occupied or when the vehicle type is incompatible
             return "redirect:/driver/search?error=" + e.getMessage();
         }
     }

@@ -11,12 +11,11 @@ import parking.project.dto.UserRegistrationForm;
 import parking.project.model.enums.UserRole;
 import parking.project.service.UserService;
 
-/**
- * [GRASP: Controller]
- * Handles system events related to user authentication, such as registration and login routing.
- * * [Goal Alignment: Authentication Mechanisms]
- * Facilitates the entry point for all user types (Driver, Owner, Admin) into the system.
- */
+/*
+    [GRASP: Controller]
+    Goal: Handles user auth system events - registration and login routing.
+    Facilitates the entry point for all user types (Driver, Owner, Admin) into the system.
+*/
 @Controller
 public class AuthController {
     private final UserService userService;
@@ -36,20 +35,20 @@ public class AuthController {
         return "login"; // Routes to login.html template
     }
 
+    // Form Binding
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
-        // [Goal Alignment: Form Binding]
         // Provide a concrete object for Thymeleaf's th:object to prevent null errors.
         model.addAttribute("registrationForm", new UserRegistrationForm());
         model.addAttribute("roles", UserRole.values());
         return "register";
     }
 
+    // [GRASP: Controller]
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute("registrationForm") UserRegistrationForm form, 
                             BindingResult result, 
                             Model model) {
-        // [GRASP: Controller]
         if (result.hasErrors()) {
             model.addAttribute("roles", UserRole.values());
             return "register";

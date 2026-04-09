@@ -15,12 +15,12 @@ import parking.project.patterns.creational.factory.SpotFactory;
 import parking.project.patterns.structural.proxy.VerifyProxy;
 import parking.project.repository.ParkingSpotRepository;
 
-/**
- * [GRASP: Controller]
- * Manages system events for Space Owners, including listing maintenance and rental management[cite: 2].
- * * [Design Pattern: Proxy - Protection Proxy]
- * Verifies the 'OWNER' role before allowing access to listing management features.
- */
+/*
+    [GRASP: Controller]
+    Goal: Manages system events for Space Owners, including listing maintenance and rental management.
+    [Design Pattern: Structural - Proxy]
+    Verifies the 'OWNER' role before allowing access to listing management features.
+*/
 @Controller
 @RequestMapping("/owner")
 public class OwnerController {
@@ -29,11 +29,9 @@ public class OwnerController {
     private final SpotFactory spotFactory;
     private final UserService userService;
 
-    /**
-     * [GRASP: Low Coupling]
-     * Dependencies are injected via the constructor to ensure the controller 
-     * is not responsible for instantiating its own logic helpers or factories.
-     */
+    // [GRASP: Low Coupling]
+    // Dependencies are injected via the constructor to ensure the controller 
+    // is not responsible for instantiating its own logic helpers or factories.
     @Autowired
     public OwnerController(ParkingSpotRepository spotRepository, VerifyProxy verifyProxy, SpotFactory spotFactory, UserService userService) {
         this.spotRepository = spotRepository;
@@ -42,10 +40,7 @@ public class OwnerController {
         this.userService = userService;
     }
 
-    /**
-     * [Goal Alignment: Listing Management]
-     * Enables owners to view and manage their registered parking spots[cite: 10].
-     */
+    // Goal: Enables owners to view and manage their registered parking spots.
     @GetMapping("/dashboard")
     public String ownerDashboard(Model model, Authentication authentication) {
         String username = authentication.getName();
@@ -53,7 +48,6 @@ public class OwnerController {
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         model.addAttribute("totalEarnings", currentUser.getTotalEarnings());
-        // Rename "spot" to "newSpot" to avoid conflict in the template
         model.addAttribute("newSpot", new ParkingSpot());
         model.addAttribute("mySpots", spotRepository.findByOwnerAndActiveTrue(currentUser));
         return "owner/dashboard";
@@ -64,12 +58,8 @@ public class OwnerController {
         return "owner/earnings"; 
     }
 
-    /**
-     * [Goal Alignment: Space Owners can add new spots]
-     * [Design Pattern: Factory Method]
-     * Uses the SpotFactory to create a new ParkingSpot instance. This encapsulates 
-     * the creation logic and ensures the spot is initialized correctly with its owner and type.
-     */
+    // [Design Pattern: Creational - Factory]
+    // Goal: Uses the SpotFactory to create a new ParkingSpot instance.
     @PostMapping("/spots/save")
     public String saveSpot(@RequestParam(required = false) Long id,
                         @RequestParam String location,
@@ -105,40 +95,29 @@ public class OwnerController {
         return "redirect:/owner/dashboard";
     }
 
-    /**
-     * [Goal Alignment: Management of Rentals]
-     * [Design Pattern: Proxy - Protection Proxy]
-     * Removes a parking spot listing after verifying ownership and roles.
-     */
+    // [Design Pattern: Structural - Proxy]
+    // Ensures that only users with the 'OWNER' role can access the deletion functionality,
+    // Goal: Removes a parking spot listing after verifying ownership and roles.
     @PostMapping("/spots/delete/{id}")
     public String deleteSpot(@PathVariable Long id, Authentication authentication) {
-        /**
-         * [GRASP: Controller]
-         * Uses the Authentication object to safely retrieve the username 
-         * from the Spring Security context.
-         */
+        // [GRASP: Information Expert]
+        // The UserService is the expert on retrieving user details.
         String username = authentication.getName();
         SpaceOwner currentUser = (SpaceOwner) userService.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        /**
-         * [Design Pattern: Proxy]
-         * Explicitly uses the VerifyProxy to ensure the user has the 'OWNER' role 
-         * before proceeding with the deletion of a resource.
-         */
+        // [Design Pattern: Proxy]
         if (!verifyProxy.isOwner(currentUser)) {
             return "redirect:/login?error=Unauthorized";
         }
 
         // [GRASP: Information Expert]
+        // The ParkingSpotRepository is the expert on retrieving spot details.
         ParkingSpot spot = spotRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Invalid spot Id:" + id));
 
-        /**
-         * [Goal Alignment: Secure Management]
-         * Verifies that the current user is the actual owner of the spot to 
-         * prevent unauthorized deletions of other owners' listings.
-         */
+        // Goal: Verifies that the current user is the actual owner of the
+        // spot to prevent unauthorized deletions of other owners' listings.
         if (!spot.getOwner().getId().equals(currentUser.getId())) {
             return "redirect:/owner/dashboard?error=Unauthorized";
         }

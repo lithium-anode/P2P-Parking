@@ -4,6 +4,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 
+/*
+    [GRASP: Controller]
+    Goal: Routes users to their respective dashboards based on their roles after login.
+*/
 @Controller
 public class DefaultController {
     @GetMapping("/default")

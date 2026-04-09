@@ -11,12 +11,12 @@ import parking.project.service.AdminService;
 import parking.project.service.UserService;
 import parking.project.model.User;
 
-/**
- * [GRASP: Controller]
- * Coordinates high-level administrative tasks such as generating reports and user oversight.
- * * [Design Pattern: Proxy - Protection Proxy]
- * Strictly enforces that only users with 'ADMIN' privileges can access these operations.
- */
+/*
+    [GRASP: Controller]
+    Goal: Co-ordinate admin tasks - reports, user management, etc.
+    [Design Pattern: Structural - Proxy]
+    Ensures only admins can access these operations by using the VerifyProxy for role verification.
+*/
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -31,10 +31,7 @@ public class AdminController {
         this.userService = userService;
     }
 
-    /**
-     * [Goal Alignment: Usage Reports]
-     * Provides access to the administrative reporting dashboard.
-     */
+    // Usage Reports
     @GetMapping("/reports")
     public String viewReports(Model model) {
         model.addAttribute("totalRevenue", adminService.calculateTotalSystemRevenue());
@@ -44,16 +41,14 @@ public class AdminController {
         return "admin/reports";
     }
 
-    /**
-     * [Goal Alignment: User Management]
-     * Displays a registry of all system users for oversight.
-     */
+    // User Management
     @GetMapping("/users")
     public String manageUsers(Model model) {
         model.addAttribute("users", adminService.getAllUsers());
         return "admin/users";
     }
 
+    // // User deleteion
     @GetMapping("/users/delete/{id}")
     public String removeUser(@PathVariable Long id, Authentication authentication) {
         String username = authentication.getName();
