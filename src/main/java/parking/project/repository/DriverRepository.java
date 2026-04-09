@@ -6,15 +6,13 @@ import parking.project.model.Driver;
 import parking.project.model.enums.VehicleType;
 import java.util.List;
 
-/**
- * [GRASP: Information Expert]
- * Expert for Driver-specific data, including vehicle types and reservation history.
- */
+/*
+    [GRASP: Information Expert]
+    Expert for Driver-specific data, including vehicle types and reservation history.
+*/
 @Repository
 public interface DriverRepository extends JpaRepository<Driver, Long> {
-    /**
-     * Finds drivers who own a specific vehicle type, useful for targeted 
-     * system notifications or analytics.
-     */
+    // Finds drivers who own a specific vehicle type
+    // for filtering parking spots by vehicle compatibility.
     List<Driver> findByVehicleTypesContaining(VehicleType vehicleType);
 }

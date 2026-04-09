@@ -7,37 +7,31 @@ import parking.project.model.SpaceOwner;
 import parking.project.model.enums.SpotType;
 import java.util.List;
 
-/**
- * [GRASP: Information Expert]
- * The expert for querying parking listings based on the criteria provided 
- * by Drivers (location, price, and spot type). 
- */
+/*
+    [GRASP: Information Expert]
+    The expert for querying parking listings based on the criteria provided 
+    by Drivers (location, price, and spot type).
+*/
 @Repository
 public interface ParkingSpotRepository extends JpaRepository<ParkingSpot, Long> {
-    /**
-     * [Goal Alignment: Driver Search Criteria]
-     * Finds spots in a specific location as requested by Drivers. 
-     */
+    // Finds spots in a specific location as requested by Drivers.
     List<ParkingSpot> findByLocationContainingIgnoreCase(String location);
 
-    /**
-     * [Goal Alignment: Driver Search Criteria]
-     * Finds spots that are within a specific budget (hourly rate). 
-     */
+    // Finds spots that are within a specific budget (hourly rate).
     List<ParkingSpot> findByHourlyRateLessThanEqual(double maxRate);
 
-    /**
-     * [Goal Alignment: Vehicle Compatibility]
-     * Finds spots that match a specific type, such as ELECTRIC_CHARGING 
-     * for electric vehicles. 
-     */
+    // Finds spots that match a specific type
     List<ParkingSpot> findBySpotType(SpotType spotType);
 
+    // Finds all spots owned by a specific Space Owner.
     List<ParkingSpot> findByOwner(SpaceOwner owner);
 
+    // Finds all *active* spots owned by a specific Space Owner.
     List<ParkingSpot> findByOwnerAndActiveTrue(SpaceOwner owner);
 
+    // Finds all *active* spots in a specific location as requested by Drivers.
     List<ParkingSpot> findByLocationContainingIgnoreCaseAndActiveTrue(String location);
 
+    // Finds all *active* spots that match a specific type.
     List<ParkingSpot> findBySpotTypeAndActiveTrue(SpotType spotType);
 }
