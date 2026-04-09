@@ -6,22 +6,10 @@ import parking.project.model.enums.VehicleType;
 
 import java.util.List;
 
-/**
- * [Design Pattern: Factory Method - Concrete Product]
- * This is a concrete implementation of the User product specifically for the 'Driver' role.
- * * [GRASP: Information Expert]
- * This class is the expert for a Driver's reservation history. It holds the collection 
- * of Bookings associated with the driver's account.
- */
 @Entity
 @Table(name = "drivers")
 @PrimaryKeyJoinColumn(name = "user_id")
 public class Driver extends User {
-    /**
-     * [Goal Alignment: Booking Records]
-     * Maintains accurate records of all reservations made by the driver to 
-     * support transaction history and checkout processes.
-     */
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
     private List<Booking> bookings;
 

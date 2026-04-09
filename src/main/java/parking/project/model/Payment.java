@@ -5,15 +5,6 @@ import parking.project.model.enums.PaymentMethod;
 
 import java.time.LocalDateTime;
 
-/**
- * [GRASP: Information Expert]
- * This class is the Information Expert for financial transactions. It knows 
- * the amount paid, the payment timestamp, and the associated booking.
- *
- * [Goal Alignment: Earnings Tracking]
- * Directly supports Space Owners in tracking their earnings  
- * and provides data for Administrators to generate usage reports.
- */
 @Entity
 @Table(name = "payments")
 public class Payment {

@@ -5,15 +5,6 @@ import parking.project.model.enums.BookingStatus;
 
 import java.time.LocalDateTime;
 
-/**
- * [GRASP: Information Expert]
- * This class is the Information Expert for reservation details, including 
- * duration, cost, and the relationship between the Driver and the ParkingSpot.
- *
- * [Goal Alignment: Transaction Management]
- * Supports the requirement to maintain accurate records of bookings  
- * and ensures that the system can verify availability.
- */
 @Entity
 @Table(name = "bookings")
 public class Booking {
@@ -38,11 +29,6 @@ public class Booking {
     @Column(nullable = false)
     private double totalCost;
 
-    /**
-     * [Design Pattern: State Integration]
-     * The status of the booking reflects the current phase of the reservation 
-     * (e.g., PENDING, CONFIRMED, COMPLETED).
-     */
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 

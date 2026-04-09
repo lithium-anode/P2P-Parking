@@ -4,23 +4,12 @@ import jakarta.persistence.*;
 import java.util.List;
 import parking.project.model.enums.UserRole;
 
-/**
- * [Design Pattern: Factory Method - Concrete Product]
- * Concrete implementation of the User product for the 'Space Owner' role.
- * * [GRASP: Information Expert]
- * This class is the expert for managing personal parking listings and financial earnings.
- */
 @Entity
 @Table(name = "space_owners")
 @PrimaryKeyJoinColumn(name = "user_id")
 public class SpaceOwner extends User {
     private double totalEarnings;
 
-    /**
-     * [Goal Alignment: Listing Management]
-     * Holds the collection of parking spots owned by this user, allowing them 
-     * to add, update, or remove listings.
-     */
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<ParkingSpot> parkingSpots;
 

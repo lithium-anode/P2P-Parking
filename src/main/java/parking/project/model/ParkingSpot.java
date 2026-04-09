@@ -12,18 +12,6 @@ import parking.project.patterns.behavioral.state.AvailableState;
 import parking.project.patterns.behavioral.state.SpotState;
 import parking.project.patterns.behavioral.strategy.PricingStrategy;
 
-/**
- * [GRASP: Information Expert]
- * This class is the Information Expert for a parking space's details, including its 
- * location, hourly rate, and current availability status.
- * * [Design Pattern: State - Context]
- * This class acts as the 'Context' in the State Pattern. It maintains a reference 
- * to a SpotState object that defines the current availability (e.g., Available, 
- * Reserved, or Occupied).
- * * [Design Pattern: Strategy - Context]
- * This class also acts as a 'Context' for the Strategy Pattern, allowing different 
- * pricing algorithms (Standard, Peak, etc.) to be applied to the spot.
- */
 @Entity
 @Table(name = "parking_spots")
 public class ParkingSpot {
@@ -48,26 +36,15 @@ public class ParkingSpot {
     @Column(nullable = false)
     private SpotStatus status = SpotStatus.AVAILABLE;
 
-    /**
-     * [Goal Alignment: Availability Management]
-     * The availability status is updated during checkouts and verified before 
-     * confirming bookings to prevent double-booking.
-     */
     @Transient // State logic handled by the State Pattern classes, not just a raw string
     private SpotState currentState;
 
-    /**
-     * [Goal Alignment: Space Owner Control]
-     * Owners are responsible for maintaining these listings and updating 
-     * information like hourly rates.
-     */
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private SpaceOwner owner;
 
     private boolean active = true; // Default to true
 
-    // Default constructor required by JPA
     public ParkingSpot() { }
 
     public ParkingSpot(String location, double hourlyRate, SpaceOwner owner, SpotType spotType) {
@@ -77,11 +54,6 @@ public class ParkingSpot {
         this.spotType = spotType;
     }
 
-    /**
-     * [Design Pattern: Strategy - Execution]
-     * Delegates the cost calculation to a specific PricingStrategy implementation 
-     * based on the owner's choice or system conditions.
-     */
     public double calculateCost(int hours, PricingStrategy strategy) {
         return strategy.calculatePrice(hours, this.hourlyRate, spotType);
     }

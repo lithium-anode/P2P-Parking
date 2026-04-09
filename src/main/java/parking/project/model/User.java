@@ -7,16 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import parking.project.model.enums.UserRole;
 
-/**
- * [GRASP: Information Expert] 
- * This class is the information expert for user identity and authentication credentials. 
- * It holds the core data (username, password, role) required to identify a user in the system.
- *
- * [Design Pattern: Factory Method - Product]
- * In the context of the Factory Method, this is the abstract 'Product'. 
- * The UserFactory will instantiate specific subclasses (Driver, SpaceOwner, Admin) 
- * based on the assigned role during registration.
- */
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED) 
@@ -40,12 +30,6 @@ public abstract class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    /**
-     * [Design Pattern: Proxy - Sensitivity]
-     * The role field is critical for the 'VerifyProxy'. The Proxy will check 
-     * this value to determine if a user has the authority to access specific 
-     * functionalities like 'manage user accounts' or 'add new spots'.
-     */
     @NotNull(message = "User role is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
