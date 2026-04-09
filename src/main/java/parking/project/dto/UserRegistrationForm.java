@@ -5,11 +5,10 @@ import java.util.List;
 import parking.project.model.enums.UserRole;
 import parking.project.model.enums.VehicleType;
 
-/**
- * [Design Pattern: Data Transfer Object (DTO)]
- * Acts as a simple container to move data from the registration form to the service layer.
- * This avoids the issue of trying to instantiate the abstract 'User' entity directly.
- */
+/*
+    [Design Pattern: Data Transfer Object (DTO)]
+    Acts as a simple container to move data from the registration form to the service layer.
+*/
 public class UserRegistrationForm {
     @NotBlank(message = "Username is required")
     @Size(min = 4, max = 20, message = "Username must be 4-20 characters")
@@ -27,7 +26,6 @@ public class UserRegistrationForm {
     private UserRole role;
 
     private List<VehicleType> vehicleTypes;
-
     
     // Getters and Setters
     public List<VehicleType> getVehicleTypes() { return vehicleTypes; }
