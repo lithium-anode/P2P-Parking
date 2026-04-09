@@ -2,10 +2,10 @@ package parking.project.patterns.behavioral.state;
 
 import parking.project.model.ParkingSpot;
 
-/**
- * [Design Pattern: State - Concrete State]
- * Represents the 'Available' status of a spot.
- */
+/*
+    [Design Pattern: Behavioral - State]
+    Represents the 'Available' status of a spot.
+*/
 public class AvailableState implements SpotState {
     @Override
     public void handleReserve(ParkingSpot spot) {

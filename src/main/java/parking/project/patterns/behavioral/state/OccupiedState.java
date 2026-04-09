@@ -2,13 +2,11 @@ package parking.project.patterns.behavioral.state;
 
 import parking.project.model.ParkingSpot;
 
-/**
- * [Design Pattern: State - Concrete State]
- * Represents the 'Occupied' status of a spot.
- * * [Goal Alignment: Checkout Logic]
- * Supports the requirement that during every checkout, the availability 
- * status of the spot will be updated.
- */
+/*
+    [Design Pattern: Behavioral - State]
+    Represents the 'Occupied' status of a spot.
+    Goal: Checkout Logic
+*/
 public class OccupiedState implements SpotState {
     @Override
     public void handleReserve(ParkingSpot spot) {
@@ -22,11 +20,6 @@ public class OccupiedState implements SpotState {
 
     @Override
     public void handleVacate(ParkingSpot spot) {
-        /**
-         * [Goal Alignment: Automatic Status Update]
-         * When the driver completes their stay (checkout), the state 
-         * transitions back to Available.
-         */
         spot.setCurrentState(new AvailableState());
     }
 
