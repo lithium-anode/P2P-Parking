@@ -11,7 +11,7 @@ import java.util.List;
 /*
     [GRASP: Information Expert]
     The expert for financial transaction records.
-    [Goal Alignment: Usage Reports]
+    Goal: Usage Reports
     Provides the data needed for Administrators to oversee system operations 
     and generate periodic financial reports.
 */

@@ -87,7 +87,7 @@ public class BookingService {
         if (spot.getSpotType() == SpotType.ELECTRIC_CHARGING) {
             return driver.getVehicleTypes().contains(VehicleType.ELECTRIC);
         }
-        return true; // Simplified for basic types
+        return true;
     }
 
     public void cancelBooking(Booking booking) {
