@@ -5,7 +5,6 @@ import parking.project.model.ParkingSpot;
 /*
     [Design Pattern: Behavioral - State]
     Represents the 'Occupied' status of a spot.
-    Goal: Checkout Logic
 */
 public class OccupiedState implements SpotState {
     @Override

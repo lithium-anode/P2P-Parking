@@ -6,10 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import parking.project.model.enums.SpotType;
 import parking.project.model.enums.SpotStatus;
-import parking.project.patterns.behavioral.state.ReservedState;
-import parking.project.patterns.behavioral.state.OccupiedState;
-import parking.project.patterns.behavioral.state.AvailableState;
-import parking.project.patterns.behavioral.state.SpotState;
+import parking.project.patterns.behavioral.state.*;
 import parking.project.patterns.behavioral.strategy.PricingStrategy;
 
 @Entity
